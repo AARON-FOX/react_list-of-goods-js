@@ -15,46 +15,34 @@ export const goodsFromServer = [
   'Garlic',
 ];
 
+function getPreparedGoods(goods, sortMethod) {
+  const goodsCopy = [...goods];
+
+  if (sortMethod) {
+    goodsCopy.sort((good1, good2) => {
+      switch (sortMethod) {
+        case 'Sort alphabetically':
+          return good1.localeCompare(good2);
+
+        case 'Sort by length':
+          return good1.length - good2.length;
+
+        default:
+          return 0;
+      }
+    });
+  }
+
+  return goodsCopy;
+}
+
 export const App = () => {
-  const [goods, setGoods] = useState(goodsFromServer);
   const [currentSort, setCurrentSort] = useState('');
   const [isReversed, setIsReversed] = useState(false);
+  let renderedGoods = getPreparedGoods(goodsFromServer, currentSort);
 
-  function handleSortAlphabetically() {
-    let goodsCopy = [...goodsFromServer].sort();
-
-    if (isReversed) {
-      goodsCopy = goodsCopy.reverse();
-    }
-
-    setGoods(goodsCopy);
-    setCurrentSort('alphabetical');
-  }
-
-  function handleSortByLength() {
-    let goodsCopy = [...goodsFromServer].sort((a, b) => a.length - b.length);
-
-    if (isReversed) {
-      goodsCopy = goodsCopy.reverse();
-    }
-
-    setGoods(goodsCopy);
-    setCurrentSort('length');
-  }
-
-  function handleReverse() {
-    const goodsCopy = [...goods].reverse();
-
-    setGoods(goodsCopy);
-    setIsReversed(!isReversed);
-  }
-
-  function handleReset() {
-    const goodsCopy = [...goodsFromServer];
-
-    setGoods(goodsCopy);
-    setCurrentSort('');
-    setIsReversed(false);
+  if (isReversed) {
+    renderedGoods = renderedGoods.toReversed();
   }
 
   return (
@@ -62,16 +50,20 @@ export const App = () => {
       <div className="buttons">
         <button
           type="button"
-          className={`button is-info ${currentSort === 'alphabetical' ? '' : 'is-light'}`}
-          onClick={handleSortAlphabetically}
+          className={`button is-info ${currentSort === 'Sort alphabetically' ? '' : 'is-light'}`}
+          onClick={() => {
+            setCurrentSort('Sort alphabetically');
+          }}
         >
           Sort alphabetically
         </button>
 
         <button
           type="button"
-          className={`button is-info ${currentSort === 'length' ? '' : 'is-light'}`}
-          onClick={handleSortByLength}
+          className={`button is-info ${currentSort === 'Sort by length' ? '' : 'is-light'}`}
+          onClick={() => {
+            setCurrentSort('Sort by length');
+          }}
         >
           Sort by length
         </button>
@@ -79,16 +71,19 @@ export const App = () => {
         <button
           type="button"
           className={`button is-info ${isReversed ? '' : 'is-light'}`}
-          onClick={handleReverse}
+          onClick={() => setIsReversed(!isReversed)}
         >
           Reverse
         </button>
 
-        {(currentSort !== '' || isReversed) && (
+        {(currentSort || isReversed) && (
           <button
             type="button"
             className="button is-info is-light"
-            onClick={handleReset}
+            onClick={() => {
+              setCurrentSort('');
+              setIsReversed(false);
+            }}
           >
             Reset
           </button>
@@ -96,7 +91,7 @@ export const App = () => {
       </div>
 
       <ul>
-        {goods.map(good => (
+        {renderedGoods.map(good => (
           <li key={good} data-cy="Good">
             {good}
           </li>
