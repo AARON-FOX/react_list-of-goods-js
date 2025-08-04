@@ -38,8 +38,8 @@ function getPreparedGoods(goods, sortMethod) {
 
 export const App = () => {
   const [currentSort, setCurrentSort] = useState('');
-  const [isReversed, setIsReversed] = useState(false);
   let renderedGoods = getPreparedGoods(goodsFromServer, currentSort);
+  const [isReversed, setIsReversed] = useState(false);
 
   if (isReversed) {
     renderedGoods = renderedGoods.toReversed();
